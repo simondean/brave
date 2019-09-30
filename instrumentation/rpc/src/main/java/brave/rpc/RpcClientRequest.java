@@ -14,9 +14,10 @@
 package brave.rpc;
 
 /**
- * Marks an interface for use in injection and {@link RpcRuleSampler}. This gives a standard type
- * to consider when parsing an outgoing context.
+ * Marks an interface for use in {@link RpcClientHandler#handleSend(RpcClientRequest)}. This gives a
+ * standard type to consider when parsing an outgoing context.
  *
+ * @see RpcClientResponse
  * @since 5.8
  */
 public abstract class RpcClientRequest extends RpcRequest {
