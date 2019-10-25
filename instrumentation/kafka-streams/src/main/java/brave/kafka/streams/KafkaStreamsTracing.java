@@ -17,6 +17,7 @@ import brave.Span;
 import brave.SpanCustomizer;
 import brave.Tracing;
 import brave.kafka.clients.KafkaTracing;
+import brave.messaging.MessagingTracing;
 import brave.propagation.TraceContext;
 import brave.propagation.TraceContextOrSamplingFlags;
 import java.util.Properties;
@@ -47,13 +48,18 @@ public final class KafkaStreamsTracing {
   final TraceContext.Injector<Headers> injector;
 
   KafkaStreamsTracing(Builder builder) { // intentionally hidden constructor
-    this.tracing = builder.tracing;
+    this.tracing = builder.messagingTracing.tracing();
     this.extractor = tracing.propagation().extractor(KafkaStreamsPropagation.GETTER);
     this.injector = tracing.propagation().injector(KafkaStreamsPropagation.SETTER);
   }
 
   public static KafkaStreamsTracing create(Tracing tracing) {
-    return new KafkaStreamsTracing.Builder(tracing).build();
+    return create(MessagingTracing.create(tracing));
+  }
+
+  /** @since 5.9 */
+  public static KafkaStreamsTracing create(MessagingTracing messagingTracing) {
+    return new Builder(messagingTracing).build();
   }
 
   /**
@@ -399,11 +405,11 @@ public final class KafkaStreamsTracing {
   }
 
   public static final class Builder {
-    final Tracing tracing;
+    final MessagingTracing messagingTracing;
 
-    Builder(Tracing tracing) {
-      if (tracing == null) throw new NullPointerException("tracing == null");
-      this.tracing = tracing;
+    Builder(MessagingTracing messagingTracing) {
+      if (messagingTracing == null) throw new NullPointerException("messagingTracing == null");
+      this.messagingTracing = messagingTracing;
     }
 
     public KafkaStreamsTracing build() {
